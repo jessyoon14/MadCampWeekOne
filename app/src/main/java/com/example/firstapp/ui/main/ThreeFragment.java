@@ -23,6 +23,7 @@ public class ThreeFragment extends Fragment {
     ImageView imageView ;
     Button button1;
     Button button2;
+    ImageEncryption imageEncryption;
     public ThreeFragment() {
 // Required empty public constructor
     }
@@ -42,6 +43,9 @@ public class ThreeFragment extends Fragment {
         button1 = view.findViewById(R.id.button);
         button2 = view.findViewById(R.id.button2);
         imageView = view.findViewById(R.id.imageView2);
+
+        imageEncryption = new ImageEncryption();
+        imageEncryption.Encrypt("/document/Image:35", "/document/Image:34");
 
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
