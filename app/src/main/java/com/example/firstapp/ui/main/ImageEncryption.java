@@ -14,7 +14,7 @@ public class ImageEncryption {
         //Bitmap backGroundImage = BitmapFactory.decodeFile(backGround);
         //Bitmap secretImage = BitmapFactory.decodeFile(secret);
         Bitmap encryptImage = createBitmap(backGroundImage.getWidth(), backGroundImage.getHeight(), ARGB_8888);//backGroundImage ;//Bitmap.createBitmap(backGroundImage); //BitmapFactory.decodeFile(backGround);
-        int p, a, b, c, d, e, f;
+        int p, a, b, c, d, e, f, g, h;
 
         if (backGroundImage.getHeight() != secretImage.getHeight() || backGroundImage.getWidth() != secretImage.getWidth())
         {
@@ -24,19 +24,22 @@ public class ImageEncryption {
         for (int i = 0; i < backGroundImage.getHeight(); i++) {
             for (int j = 0; j < backGroundImage.getWidth(); j++) {
                 p = backGroundImage.getPixel(j, i);
-                a = (p & 0xff0000) >> 16;
-                b = (p & 0x00ff00) >> 8;
-                c = (p & 0x0000ff);
+                a = (p >> 24) & 0xff;
+                b = (p >> 16) & 0xff;
+                c = (p  >> 8) & 0xff;
+                d = (p & 0x0ff);
                 p = secretImage.getPixel(j, i);
-                d = (p & 0xff0000) >> 16;
-                e = (p & 0x00ff00) >> 8;
-                f = (p & 0x0000ff);
-                a = (16 * (a / 16) + d / 16) << 16;
-                b = (16 * (b / 16) + e / 16) << 8;
-                c = 16 * (c / 16) + f / 16;
+                e = (p >> 24) & 0xff;
+                f = (p >> 16) & 0xff;
+                g = (p  >> 8) & 0xff;
+                h = (p & 0x0ff);
+                a = (16 * (a / 16) + e / 16) << 24;
+                b = (16 * (b / 16) + f / 16) << 16;
+                c = (16 * (c / 16) + g / 16) <<8;
+                d = (16 * (d / 16) + h / 16);
 
                 try {
-                    encryptImage.setPixel(j, i, a+b+c);//0x008577);
+                    encryptImage.setPixel(j, i, a+b+c+d);//0x008577);
                 } catch (IllegalStateException z){
                     z.printStackTrace();
                 }
@@ -47,22 +50,22 @@ public class ImageEncryption {
 
     public Bitmap Decrypt (Bitmap encryptImage) {
         Bitmap decryptImage = createBitmap(encryptImage.getWidth(), encryptImage.getHeight(), ARGB_8888);
-        int p, a, b, c;
-
-
+        int p, a, b, c, d;
 
         for (int i = 0; i < encryptImage.getHeight(); i++)
         {
             for (int j = 0; j < encryptImage.getWidth(); j++)
             {
                 p = encryptImage.getPixel(j, i);
-                a = (p & 0xff0000) >> 16;
-                b = (p & 0x00ff00) >> 8;
-                c = (p & 0x0000ff);
-                a = (16 * (a % 16)) << 16;
-                b = (16 * (b % 16)) << 8;
-                c = 16 * (c % 16);
-                decryptImage.setPixel(j,i, a + b + c);
+                a = (p >> 24) & 0xff;
+                b = (p >> 16) & 0xff;
+                c = (p  >> 8) & 0xff;
+                d = (p & 0x0ff);
+                a = (16 * (a % 16)) << 24;
+                b = (16 * (b % 16)) << 16;
+                c = (16 * (c % 16)) << 8;
+                d = 16 * (d % 16);
+                decryptImage.setPixel(j,i, a + b + c + d);
             }
         }
         return decryptImage;
