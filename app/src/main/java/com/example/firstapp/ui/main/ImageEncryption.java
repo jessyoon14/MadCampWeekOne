@@ -20,6 +20,7 @@ public class ImageEncryption {
         {
             return backGroundImage;
         }
+
         for (int i = 0; i < backGroundImage.getHeight(); i++) {
             for (int j = 0; j < backGroundImage.getWidth(); j++) {
                 p = backGroundImage.getPixel(j, i);
