@@ -20,6 +20,7 @@ public class ImageEncryption {
         {
             return backGroundImage;
         }
+
         for (int i = 0; i < backGroundImage.getHeight(); i++) {
             for (int j = 0; j < backGroundImage.getWidth(); j++) {
                 p = backGroundImage.getPixel(j, i);
@@ -45,7 +46,7 @@ public class ImageEncryption {
     }
 
     public Bitmap Decrypt (Bitmap encryptImage) {
-        Bitmap decryptImage = encryptImage;// createBitmap(encryptImage.getWidth(), encryptImage.getHeight(), ARGB_8888);
+        Bitmap decryptImage = createBitmap(encryptImage.getWidth(), encryptImage.getHeight(), ARGB_8888);
         int p, a, b, c;
 
 
@@ -61,7 +62,7 @@ public class ImageEncryption {
                 a = (16 * (a % 16)) << 16;
                 b = (16 * (b % 16)) << 8;
                 c = 16 * (c % 16);
-//                decryptImage.setPixel(j,i, a + b + c);
+                decryptImage.setPixel(j,i, a + b + c);
             }
         }
         return decryptImage;
