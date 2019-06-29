@@ -2,8 +2,10 @@ package com.example.firstapp.ui.main;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +16,25 @@ import androidx.fragment.app.Fragment;
 
 import com.example.firstapp.R;
 
+import java.io.IOException;
+import java.util.Dictionary;
+import java.util.HashMap;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ThreeFragment extends Fragment {
 
     private static final int GALLERY_REQUEST_CODE = 10;
-    ImageView imageView ;
+    ImageView imageView, imageView2 , imageView4, imageView5;
     Button button1;
     Button button2;
+    ImageEncryption imageEncryption;
+    Bitmap backgroundImage, secretImage;
+    int count = 0;
+    //HashMap<String, Bitmap> bitmapDict = new HashMap<String, Bitmap>();
+
+
     public ThreeFragment() {
 // Required empty public constructor
     }
@@ -42,6 +54,10 @@ public class ThreeFragment extends Fragment {
         button1 = view.findViewById(R.id.button);
         button2 = view.findViewById(R.id.button2);
         imageView = view.findViewById(R.id.imageView2);
+        imageView2 = view.findViewById(R.id.imageView3);
+        imageView4 = view.findViewById(R.id.imageView4);
+        imageView5 = view.findViewById(R.id.imageView5);
+
 
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,7 +65,12 @@ public class ThreeFragment extends Fragment {
                 pickFromGallery();
             }
         });
-
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickFromGallery();
+            }
+        });
 
         return view;
     }
@@ -65,6 +86,7 @@ public class ThreeFragment extends Fragment {
         intent.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
         // Launching the Intent
         startActivityForResult(intent,GALLERY_REQUEST_CODE);
+
     }
 
     @Override
@@ -74,11 +96,37 @@ public class ThreeFragment extends Fragment {
             switch (requestCode){
                 case GALLERY_REQUEST_CODE:
                     //data.getData returns the content URI for the selected Image
+                    count ++;
+
                     Uri selectedImage = data.getData();
-                    imageView.setImageURI(selectedImage);
+
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getApplicationContext().getContentResolver(), selectedImage);
+                        if (count %2 == 1) {
+                            imageView.setImageURI(selectedImage);
+                            backgroundImage = bitmap;
+
+                        }
+                        else {
+                            secretImage = bitmap;
+                            imageView4.setImageURI(selectedImage);
+
+                            imageEncryption = new ImageEncryption();
+                            Bitmap encrypted = imageEncryption.Encrypt(backgroundImage, secretImage);
+                            imageView5.setImageBitmap(imageEncryption.Decrypt(encrypted));
+                            imageView2.setImageBitmap(encrypted);
+                            count = 0;
+
+
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     break;
             }
-    }
+
+}
 
 }
 
