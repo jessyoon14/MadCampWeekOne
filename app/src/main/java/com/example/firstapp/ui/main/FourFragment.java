@@ -9,36 +9,31 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.firstapp.R;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ThreeFragment extends Fragment {
+public class FourFragment extends Fragment {
 
     private static final int GALLERY_REQUEST_CODE = 10;
-    ImageView imageView1, imageView2 , imageView3;
-    Button button1;
-    Button button2, button3;
+    ImageView imageView1, imageView2;
+    Button button1, button2, button3;
     ImageEncryption imageEncryption;
-    Bitmap backgroundImage, secretImage;
-    boolean bgInitial = false;
-    boolean scInitial = false;
-    boolean bgJustNow = false;
+    Bitmap encryptedImage, decryptedImage;
+    int count = 0;
+    boolean hasImage = false;
     //HashMap<String, Bitmap> bitmapDict = new HashMap<String, Bitmap>();
 
 
-    public ThreeFragment() {
+    public FourFragment() {
 // Required empty public constructor
     }
 
@@ -59,50 +54,24 @@ public class ThreeFragment extends Fragment {
         button3 = view.findViewById(R.id.button3);
         imageView1 = view.findViewById(R.id.imageView1);
         imageView2 = view.findViewById(R.id.imageView2);
-        imageView3 = view.findViewById(R.id.imageView3);
-        //imageView4 = view.findViewById(R.id.imageView4);
-
 
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //b1 = false;
                 pickFromGallery();
-                bgInitial = true;
-                bgJustNow = true;
-            }
-        });
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //b2 = false;
-                pickFromGallery();
-                scInitial = true;
-                bgJustNow = false;
+                hasImage = true;
             }
         });
 
         imageEncryption = new ImageEncryption();
-        button3.setOnClickListener (new View.OnClickListener() {
+        button2.setOnClickListener (new View.OnClickListener() {
            @Override
            public void onClick (View view) {
-               if (bgInitial && scInitial) {
-                   //give "Encrypting Message"
-                   Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Encryption In Progress", Toast.LENGTH_LONG);
-                   toast.show();
-                   //Toast.makeText(getContext(), "Encryption In Progress", Toast.LENGTH_LONG).show();
-                   //Snackbar.make(view, "Encryption In Progress...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-
-
-                   Bitmap encrypted = imageEncryption.Encrypt(backgroundImage, secretImage);
-                   imageView3.setImageBitmap(encrypted);
-                   //give "Encrypting Complete"
-                   //Snackbar.make(view, "Encryption Successfully Completed", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+               if (hasImage) {
+                   decryptedImage = imageEncryption.Decrypt(encryptedImage);
+                   imageView2.setImageBitmap(decryptedImage);
                }
-               else {
-                   //else: give error message\
-                   Snackbar.make(view, "Please Choose Both Background and Secret Images", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-               }
+               //else: give error message
            }
         });
 
@@ -137,18 +106,8 @@ public class ThreeFragment extends Fragment {
 
                     try {
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getApplicationContext().getContentResolver(), selectedImage);
-                        if (bgJustNow) {
-                            imageView1.setImageURI(selectedImage);
-                            backgroundImage = bitmap;
-
-                        }
-                        else {
-                            secretImage = bitmap;
-                            imageView2.setImageURI(selectedImage);
-
-
-                            //count = 0;
-                        }
+                        imageView1.setImageURI(selectedImage);
+                        encryptedImage = bitmap;
 
                     } catch (IOException e) {
                         e.printStackTrace();

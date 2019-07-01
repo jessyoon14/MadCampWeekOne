@@ -2,5 +2,7 @@
     <string name="app_name">firstapp</string>
     <string name="tab_text_1">Contacts</string>
     <string name="tab_text_2">Gallery</string>
-    <string name="tab_text_3">Free</string>
+    <string name="tab_text_3">Encrypt</string>
+    <string name="tab_text_4">Decrypt</string>
+
 </resources>
