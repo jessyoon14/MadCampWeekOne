@@ -46,13 +46,8 @@ public class ThreeFragment extends Fragment {
     boolean bgInitial = false;
     boolean scInitial = false;
     boolean bgJustNow = false;
-<<<<<<< HEAD
     ProgressBar simpleProgressBar;
-=======
     Bitmap encrypted;
->>>>>>> master
-    //HashMap<String, Bitmap> bitmapDict = new HashMap<String, Bitmap>();
-
 
     public ThreeFragment() {
 // Required empty public constructor
@@ -110,7 +105,6 @@ public class ThreeFragment extends Fragment {
 
 
                    //give "Encrypting Message"
-<<<<<<< HEAD
 //                   Toast.makeText(getContext(), "Encryption In Progress", Toast.LENGTH_LONG).show();
                    //Snackbar.make(view, "Encryption In Progress...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
@@ -119,14 +113,7 @@ public class ThreeFragment extends Fragment {
                    new EncryptTask().execute(backgroundImage, secretImage);
 //                   setProgressValue(progress + 10);
                    imageView3.setImageBitmap(encryptedImage);
-=======
-                   //Toast.makeText(getContext(), "Encryption In Progress", Toast.LENGTH_LONG).show();
-                   //Snackbar.make(view, "Encryption In Progress...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
-
-                   encrypted = imageEncryption.Encrypt(backgroundImage, secretImage);
-                   imageView3.setImageBitmap(encrypted);
->>>>>>> master
                    //give "Encrypting Complete"
                    //Snackbar.make(view, "Encryption Successfully Completed", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                }
@@ -167,23 +154,8 @@ public class ThreeFragment extends Fragment {
     }
 
     private void setProgressValue(final int progress) {
-
         // set the progress
         simpleProgressBar.setProgress(progress);
-        // thread is used to change the progress value
-//        Thread thread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                setProgressValue(progress + 10);
-//            }
-//        });
-        //thread.start();
-
     }
 
 
