@@ -3,6 +3,7 @@ package com.example.firstapp.ui.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -118,7 +119,7 @@ public class ThreeFragment extends Fragment {
             @Override
             public void onClick (View view) {
                 String root = Environment.getExternalStorageDirectory().toString();
-                File myDir = new File(root + "/req_images");
+                File myDir = new File(root + "/DCIM/Encryption");
                 myDir.mkdirs();
                 Random generator = new Random();
                 int n = 10000;
@@ -133,6 +134,12 @@ public class ThreeFragment extends Fragment {
                     encrypted.compress(Bitmap.CompressFormat.JPEG, 90, out);
                     out.flush();
                     out.close();
+                    scanFile(myDir + "Image-" + n + ".jpg");
+                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    intent.setData(Uri.fromFile(file));
+
+                    getActivity().sendBroadcast(intent);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -143,6 +150,15 @@ public class ThreeFragment extends Fragment {
         return view;
     }
 
+    private void scanFile(String path) {
+
+        MediaScannerConnection.scanFile(getContext(), new String[] { path }, null, new MediaScannerConnection.OnScanCompletedListener() {
+
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.d("Tag", "Scan finished. You can view the image in the gallery now.");
+                    }
+                });
+    }
 
     private void pickFromGallery(){
         //Create an Intent with action as ACTION_PICK
