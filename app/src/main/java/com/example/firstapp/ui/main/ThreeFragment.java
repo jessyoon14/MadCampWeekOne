@@ -5,11 +5,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -19,7 +20,12 @@ import androidx.fragment.app.Fragment;
 import com.example.firstapp.R;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Random;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -29,12 +35,13 @@ public class ThreeFragment extends Fragment {
     private static final int GALLERY_REQUEST_CODE = 10;
     ImageView imageView1, imageView2 , imageView3;
     Button button1;
-    Button button2, button3;
+    Button button2, button3, button4;
     ImageEncryption imageEncryption;
     Bitmap backgroundImage, secretImage;
     boolean bgInitial = false;
     boolean scInitial = false;
     boolean bgJustNow = false;
+    Bitmap encrypted;
     //HashMap<String, Bitmap> bitmapDict = new HashMap<String, Bitmap>();
 
 
@@ -57,6 +64,7 @@ public class ThreeFragment extends Fragment {
         button1 = view.findViewById(R.id.button);
         button2 = view.findViewById(R.id.button2);
         button3 = view.findViewById(R.id.button3);
+        button4 = view.findViewById(R.id.button4);
         imageView1 = view.findViewById(R.id.imageView1);
         imageView2 = view.findViewById(R.id.imageView2);
         imageView3 = view.findViewById(R.id.imageView3);
@@ -86,15 +94,15 @@ public class ThreeFragment extends Fragment {
         button3.setOnClickListener (new View.OnClickListener() {
            @Override
            public void onClick (View view) {
+               Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Encryption In Progress", Toast.LENGTH_LONG);
+               toast.show();
                if (bgInitial && scInitial) {
                    //give "Encrypting Message"
-                   Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Encryption In Progress", Toast.LENGTH_LONG);
-                   toast.show();
                    //Toast.makeText(getContext(), "Encryption In Progress", Toast.LENGTH_LONG).show();
                    //Snackbar.make(view, "Encryption In Progress...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
 
-                   Bitmap encrypted = imageEncryption.Encrypt(backgroundImage, secretImage);
+                   encrypted = imageEncryption.Encrypt(backgroundImage, secretImage);
                    imageView3.setImageBitmap(encrypted);
                    //give "Encrypting Complete"
                    //Snackbar.make(view, "Encryption Successfully Completed", Snackbar.LENGTH_LONG).setAction("Action", null).show();
@@ -104,6 +112,31 @@ public class ThreeFragment extends Fragment {
                    Snackbar.make(view, "Please Choose Both Background and Secret Images", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                }
            }
+        });
+
+        button4.setOnClickListener (new View.OnClickListener() {
+            @Override
+            public void onClick (View view) {
+                String root = Environment.getExternalStorageDirectory().toString();
+                File myDir = new File(root + "/req_images");
+                myDir.mkdirs();
+                Random generator = new Random();
+                int n = 10000;
+                n = generator.nextInt(n);
+                String fname = "Image-" + n + ".jpg";
+                File file = new File(myDir, fname);
+                Log.i(TAG, "" + file);
+                if (file.exists())
+                    file.delete();
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    encrypted.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                    out.flush();
+                    out.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         });
 
 
