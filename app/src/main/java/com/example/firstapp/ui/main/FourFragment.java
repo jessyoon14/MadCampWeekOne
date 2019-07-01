@@ -47,7 +47,7 @@ public class FourFragment extends Fragment {
                              Bundle savedInstanceState) {
 // Inflate the layout for this fragment
 
-        View view = inflater.inflate (R.layout.fragment_three, container, false);
+        View view = inflater.inflate (R.layout.fragment_four, container, false);
 
         button1 = view.findViewById(R.id.button);
         button2 = view.findViewById(R.id.button2);
