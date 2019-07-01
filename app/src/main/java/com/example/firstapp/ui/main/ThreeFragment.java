@@ -47,11 +47,9 @@ public class ThreeFragment extends Fragment {
     boolean bgInitial = false;
     boolean scInitial = false;
     boolean bgJustNow = false;
-<<<<<<< HEAD
     ProgressBar simpleProgressBar;
-=======
     Bitmap encrypted;
->>>>>>> master
+
     //HashMap<String, Bitmap> bitmapDict = new HashMap<String, Bitmap>();
 
 
@@ -111,7 +109,6 @@ public class ThreeFragment extends Fragment {
 
 
                    //give "Encrypting Message"
-<<<<<<< HEAD
 //                   Toast.makeText(getContext(), "Encryption In Progress", Toast.LENGTH_LONG).show();
                    //Snackbar.make(view, "Encryption In Progress...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
@@ -120,14 +117,12 @@ public class ThreeFragment extends Fragment {
                    new EncryptTask().execute(backgroundImage, secretImage);
 //                   setProgressValue(progress + 10);
                    imageView3.setImageBitmap(encryptedImage);
-=======
                    //Toast.makeText(getContext(), "Encryption In Progress", Toast.LENGTH_LONG).show();
                    //Snackbar.make(view, "Encryption In Progress...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
 
                    encrypted = imageEncryption.Encrypt(backgroundImage, secretImage);
                    imageView3.setImageBitmap(encrypted);
->>>>>>> master
                    //give "Encrypting Complete"
                    //Snackbar.make(view, "Encryption Successfully Completed", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                }
@@ -183,6 +178,10 @@ public class ThreeFragment extends Fragment {
                 });
     }
 
+    private void setProgressValue (final int progress){
+        simpleProgressBar.setProgress(progress);
+    }
+
     private void pickFromGallery(){
         //Create an Intent with action as ACTION_PICK
         Intent intent=new Intent(Intent.ACTION_PICK);
@@ -230,6 +229,7 @@ public class ThreeFragment extends Fragment {
             }
 
     }
+
 
     private class EncryptTask extends AsyncTask<Bitmap, Integer, Bitmap> {
         // Do the long-running work in here

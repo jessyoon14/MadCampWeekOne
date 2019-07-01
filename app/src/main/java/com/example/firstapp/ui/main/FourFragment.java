@@ -3,9 +3,12 @@ package com.example.firstapp.ui.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +19,12 @@ import androidx.fragment.app.Fragment;
 
 import com.example.firstapp.R;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Random;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -75,8 +83,49 @@ public class FourFragment extends Fragment {
            }
         });
 
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick (View view) {
+                String root = Environment.getExternalStorageDirectory().toString();
+                File myDir = new File(root + "/DCIM/Decryption");
+                myDir.mkdirs();
+                Random generator = new Random();
+                int n = 10000;
+                n = generator.nextInt(n);
+                String fname = "Image-" + n + ".jpg";
+                File file = new File(myDir, fname);
+                Log.i(TAG, "" + file);
+                if (file.exists())
+                    file.delete();
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    decryptedImage.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                    out.flush();
+                    out.close();
+                    scanFile(myDir + "Image-" + n + ".jpg");
+                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    intent.setData(Uri.fromFile(file));
+
+                    getActivity().sendBroadcast(intent);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
         return view;
+    }
+
+    private void scanFile(String path) {
+
+        MediaScannerConnection.scanFile(getContext(), new String[] { path }, null, new MediaScannerConnection.OnScanCompletedListener() {
+
+            public void onScanCompleted(String path, Uri uri) {
+                Log.d("Tag", "Scan finished. You can view the image in the gallery now.");
+            }
+        });
     }
 
 
