@@ -48,7 +48,7 @@ public class ThreeFragment extends Fragment {
     boolean scInitial = false;
     boolean bgJustNow = false;
     ProgressBar simpleProgressBar;
-    Bitmap encrypted;
+
 
     public ThreeFragment() {
 // Required empty public constructor
@@ -74,7 +74,6 @@ public class ThreeFragment extends Fragment {
         imageView2 = view.findViewById(R.id.imageView2);
         imageView3 = view.findViewById(R.id.imageView3);
         simpleProgressBar = (ProgressBar) view.findViewById(R.id.simpleProgressBar);
-        //imageView4 = view.findViewById(R.id.imageView4);
         simpleProgressBar.setVisibility(View.INVISIBLE);
 
         button1.setOnClickListener(new View.OnClickListener() {
@@ -148,7 +147,7 @@ public class ThreeFragment extends Fragment {
                     file.delete();
                 try {
                     FileOutputStream out = new FileOutputStream(file);
-                    encrypted.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                    encryptedImage.compress(Bitmap.CompressFormat.JPEG, 90, out);
                     out.flush();
                     out.close();
                     scanFile(myDir + "Image-" + n + ".jpg");

@@ -3,8 +3,10 @@ package com.example.firstapp.ui.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -14,16 +16,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.firstapp.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
+import static android.graphics.Bitmap.Config.ARGB_8888;
+import static android.graphics.Bitmap.createBitmap;
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 /**
@@ -36,6 +43,7 @@ public class FourFragment extends Fragment {
     Button button1, button2, button3;
     ImageEncryption imageEncryption;
     Bitmap encryptedImage, decryptedImage;
+    ProgressBar simpleProgressBar;
     int count = 0;
     boolean hasImage = false;
     //HashMap<String, Bitmap> bitmapDict = new HashMap<String, Bitmap>();
@@ -62,7 +70,8 @@ public class FourFragment extends Fragment {
         button3 = view.findViewById(R.id.button3);
         imageView1 = view.findViewById(R.id.imageView1);
         imageView2 = view.findViewById(R.id.imageView2);
-
+        simpleProgressBar = (ProgressBar) view.findViewById(R.id.simpleProgressBar);
+        simpleProgressBar.setVisibility(View.INVISIBLE);
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -76,8 +85,14 @@ public class FourFragment extends Fragment {
            @Override
            public void onClick (View view) {
                if (hasImage) {
-                   decryptedImage = imageEncryption.Decrypt(encryptedImage);
-                   imageView2.setImageBitmap(decryptedImage);
+                   Toast.makeText(getContext(), "Decryption In Progress", Toast.LENGTH_SHORT).show();
+                   new FourFragment.DecryptTask().execute(encryptedImage);
+//                   decryptedImage = imageEncryption.Decrypt(encryptedImage);
+//                   imageView2.setImageBitmap(decryptedImage);
+               }
+               else {
+                   //else: give error message\
+                   Snackbar.make(view, "Please Choose Image to Decrypt", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                }
                //else: give error message
            }
@@ -111,13 +126,17 @@ public class FourFragment extends Fragment {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
             }
         });
 
 
         return view;
     }
-
+    private void setProgressValue (final int progress){
+        simpleProgressBar.setProgress(progress);
+    }
     private void scanFile(String path) {
 
         MediaScannerConnection.scanFile(getContext(), new String[] { path }, null, new MediaScannerConnection.OnScanCompletedListener() {
@@ -165,7 +184,68 @@ public class FourFragment extends Fragment {
                     break;
             }
 
-}
+    }
+
+    private class DecryptTask extends AsyncTask<Bitmap, Integer, Bitmap> {
+        // Do the long-running work in here
+
+        protected void onPreExecute(){
+            simpleProgressBar.setVisibility(View.VISIBLE);
+            setProgressValue(0);
+            imageView2.setImageResource(R.drawable.ic_launcher_background);
+
+//            if (backgroundImage.getHeight() != secretImage.getHeight() || backgroundImage.getWidth() != secretImage.getWidth()){
+//                Toast.makeText(getContext(), "Encryption In Progress", Toast.LENGTH_SHORT).show();
+//            }
+//            else {
+//                Toast.makeText(getContext(), "Cannot encrypt! Images have different sizes!", Toast.LENGTH_SHORT).show();
+//            }
+
+        }
+        protected Bitmap doInBackground(Bitmap... imgs) {
+            //encryptedImage = imageEncryption.Encrypt(backgroundImage, secretImage);
+
+            Bitmap decryptImage = createBitmap(encryptedImage.getWidth(), encryptedImage.getHeight(), ARGB_8888);
+            int p, a, b, c, d;
+
+            for (int i = 0; i < encryptedImage.getHeight(); i++)
+            {
+                for (int j = 0; j < encryptedImage.getWidth(); j++)
+                {
+                    p = encryptedImage.getPixel(j, i);
+                    a = (p >> 24) & 0xff;
+                    b = (p >> 16) & 0xff;
+                    c = (p  >> 8) & 0xff;
+                    d = (p & 0x0ff);
+                    a = (16 * (a % 16)) << 24;
+                    b = (16 * (b % 16)) << 16;
+                    c = (16 * (c % 16)) << 8;
+                    d = 16 * (d % 16);
+                    decryptImage.setPixel(j,i, a + b + c + d);
+                }
+                if (i % 100 == 0) {
+                    publishProgress((int)((i*100.0 / encryptedImage.getHeight())));
+                }
+            }
+
+            decryptedImage = decryptImage;
+            return decryptedImage;
+        }
+
+        // This is called each time you call publishProgress()
+        protected void onProgressUpdate(Integer... progress) {
+            //setProgressPercent(progress[0]);
+            setProgressValue(progress[0]);
+        }
+
+        // This is called when doInBackground() is finished
+        protected void onPostExecute(Bitmap result) {
+            Toast.makeText(getContext(), "Decryption complete", Toast.LENGTH_SHORT).show();
+            //showNotification("Processing Complete");
+            simpleProgressBar.setVisibility(View.INVISIBLE);
+            imageView2.setImageBitmap(result);
+        }
+    }
 
 }
 
