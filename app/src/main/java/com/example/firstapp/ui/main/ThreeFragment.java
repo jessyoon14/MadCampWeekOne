@@ -135,18 +135,9 @@ public class ThreeFragment extends Fragment {
         button4.setOnClickListener (new View.OnClickListener() {
             @Override
             public void onClick (View view) {
-                final File myDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "encrypted");
-
-                if (!myDir.exists()) {
-                    Log.d(TAG, "Folder doesn't exist, creating it...");
-                    boolean rv = myDir.mkdir();
-                    Log.d(TAG, "Folder creation " + ( rv ? "success" : "failed"));
-                } else {
-                    Log.d(TAG, "Folder already exists.");
-                }
-//                String root = Environment.getExternalStorageDirectory().toString();
-//                File myDir = new File(root + "/Encryption");
-//                myDir.mkdirs();
+                String root = Environment.getExternalStorageDirectory().toString();
+                File myDir = new File(root + "/DCIM/Encryption");
+                myDir.mkdirs();
                 Random generator = new Random();
                 int n = 10000;
                 n = generator.nextInt(n);
