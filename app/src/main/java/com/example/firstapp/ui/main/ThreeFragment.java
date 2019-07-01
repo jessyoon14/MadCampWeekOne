@@ -3,6 +3,7 @@ package com.example.firstapp.ui.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -99,8 +100,7 @@ public class ThreeFragment extends Fragment {
         button3.setOnClickListener (new View.OnClickListener() {
            @Override
            public void onClick (View view) {
-               Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Encryption In Progress", Toast.LENGTH_LONG);
-               toast.show();
+
                if (bgInitial && scInitial) {
 
 
@@ -110,9 +110,17 @@ public class ThreeFragment extends Fragment {
 
 
                    //Bitmap encrypted = imageEncryption.Encrypt(backgroundImage, secretImage);
-                   new EncryptTask().execute(backgroundImage, secretImage);
+                   if (backgroundImage.getHeight() != secretImage.getHeight() || backgroundImage.getWidth() != secretImage.getWidth()){
+                       Toast.makeText(getContext(), "Cannot encrypt! Images have different sizes!", Toast.LENGTH_SHORT).show();
+                   }
+                   else {
+
+                       Toast.makeText(getContext(), "Encryption In Progress", Toast.LENGTH_SHORT).show();
+                       new EncryptTask().execute(backgroundImage, secretImage);
+                   }
+                   //new EncryptTask().execute(backgroundImage, secretImage);
 //                   setProgressValue(progress + 10);
-                   imageView3.setImageBitmap(encryptedImage);
+                  // imageView3.setImageBitmap(encryptedImage);
 
                    //give "Encrypting Complete"
                    //Snackbar.make(view, "Encryption Successfully Completed", Snackbar.LENGTH_LONG).setAction("Action", null).show();
@@ -127,9 +135,18 @@ public class ThreeFragment extends Fragment {
         button4.setOnClickListener (new View.OnClickListener() {
             @Override
             public void onClick (View view) {
-                String root = Environment.getExternalStorageDirectory().toString();
-                File myDir = new File(root + "/req_images");
-                myDir.mkdirs();
+                final File myDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "encrypted");
+
+                if (!myDir.exists()) {
+                    Log.d(TAG, "Folder doesn't exist, creating it...");
+                    boolean rv = myDir.mkdir();
+                    Log.d(TAG, "Folder creation " + ( rv ? "success" : "failed"));
+                } else {
+                    Log.d(TAG, "Folder already exists.");
+                }
+//                String root = Environment.getExternalStorageDirectory().toString();
+//                File myDir = new File(root + "/Encryption");
+//                myDir.mkdirs();
                 Random generator = new Random();
                 int n = 10000;
                 n = generator.nextInt(n);
@@ -143,9 +160,17 @@ public class ThreeFragment extends Fragment {
                     encrypted.compress(Bitmap.CompressFormat.JPEG, 90, out);
                     out.flush();
                     out.close();
+                    scanFile(myDir + "Image-" + n + ".jpg");
+                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    intent.setData(Uri.fromFile(file));
+
+                    getActivity().sendBroadcast(intent);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -153,11 +178,19 @@ public class ThreeFragment extends Fragment {
         return view;
     }
 
-    private void setProgressValue(final int progress) {
-        // set the progress
-        simpleProgressBar.setProgress(progress);
+    private void scanFile(String path) {
+
+        MediaScannerConnection.scanFile(getContext(), new String[] { path }, null, new MediaScannerConnection.OnScanCompletedListener() {
+
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.d("Tag", "Scan finished. You can view the image in the gallery now.");
+                    }
+                });
     }
 
+    private void setProgressValue (final int progress){
+        simpleProgressBar.setProgress(progress);
+    }
 
     private void pickFromGallery(){
         //Create an Intent with action as ACTION_PICK
@@ -205,15 +238,25 @@ public class ThreeFragment extends Fragment {
                     break;
             }
 
+
+
     }
+
 
     private class EncryptTask extends AsyncTask<Bitmap, Integer, Bitmap> {
         // Do the long-running work in here
 
         protected void onPreExecute(){
             simpleProgressBar.setVisibility(View.VISIBLE);
+            setProgressValue(0);
             imageView3.setImageResource(R.drawable.ic_launcher_background);
-            Toast.makeText(getContext(), "Encryption In Progress", Toast.LENGTH_LONG).show();
+
+//            if (backgroundImage.getHeight() != secretImage.getHeight() || backgroundImage.getWidth() != secretImage.getWidth()){
+//                Toast.makeText(getContext(), "Encryption In Progress", Toast.LENGTH_SHORT).show();
+//            }
+//            else {
+//                Toast.makeText(getContext(), "Cannot encrypt! Images have different sizes!", Toast.LENGTH_SHORT).show();
+//            }
 
         }
         protected Bitmap doInBackground(Bitmap... imgs) {
@@ -286,9 +329,10 @@ public class ThreeFragment extends Fragment {
 
         // This is called when doInBackground() is finished
         protected void onPostExecute(Bitmap result) {
+            Toast.makeText(getContext(), "Encryption complete", Toast.LENGTH_SHORT).show();
             //showNotification("Processing Complete");
             simpleProgressBar.setVisibility(View.INVISIBLE);
-            imageView3.setImageBitmap(encryptedImage);
+            imageView3.setImageBitmap(result);
         }
     }
 
